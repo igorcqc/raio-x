@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <!-- Meta tags básicas -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Raio-X de Clientes para Lojas de Móveis Planejados. Identifique onde sua loja está perdendo projetos e o que ajustar para fechar mais com os leads que você já tem.">
+  <title>Raio-X de Clientes para Lojas de Planejados</title>
+
+  <!-- Google Fonts: Inter (tipografia clean e moderna) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* ============================================================
+       VARIÁVEIS DE TEMA
+       ============================================================ */
+    :root {
+      --bg:        #0c0c0e;   /* fundo principal (preto/cinza bem escuro) */
+      --bg-alt:    #131316;   /* fundo alternado de seções */
+      --card:      #1a1a1f;   /* fundo de cards */
+      --card-line: #2a2a31;   /* borda sutil dos cards */
+      --gold:      #f5c518;   /* dourado/amarelo dos botões e destaques */
+      --gold-soft: #e9b90f;   /* dourado hover */
+      --text:      #f4f4f5;   /* texto branco */
+      --muted:     #a9a9b2;   /* texto cinza claro */
+      --dark-text: #0c0c0e;   /* texto escuro sobre botão dourado */
+      --radius:    16px;
+      --max:       860px;     /* largura máxima do conteúdo */
+    }
+
+    /* ============================================================
+       RESET / BASE
+       ============================================================ */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    section {
+      padding: 80px 24px;
+    }
+
+    .container {
+      max-width: var(--max);
+      margin: 0 auto;
+    }
+
+    h1, h2, h3 { line-height: 1.2; letter-spacing: -0.01em; }
+
+    .gold-text { color: var(--gold); }
+
+    .muted { color: var(--muted); }
+
+    /* ============================================================
+       BADGE (cápsula dourada em caixa alta)
+       ============================================================ */
+    .badge {
+      display: inline-block;
+      background: var(--gold);
+      color: var(--dark-text);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 8px 16px;
+      border-radius: 999px;
+      margin-bottom: 28px;
+    }
+
+    /* ============================================================
+       BOTÕES
+       ============================================================ */
+    .btn {
+      display: inline-block;
+      background: var(--gold);
+      color: var(--dark-text);
+      font-weight: 700;
+      font-size: 17px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      padding: 18px 34px;
+      border-radius: 999px;
+      transition: transform 0.15s ease, background 0.15s ease;
+      font-family: inherit;
+    }
+    .btn:hover { background: var(--gold-soft); transform: translateY(-2px); }
+    .btn:active { transform: translateY(0); }
+
+    /* ============================================================
+       TOPO / LOGO
+       ============================================================ */
+    .topbar {
+      padding: 22px 24px;
+      border-bottom: 1px solid var(--card-line);
+    }
+    .topbar .logo {
+      max-width: var(--max);
+      margin: 0 auto;
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: 0.02em;
+    }
+    .topbar .logo span { color: var(--gold); }
+
+    /* ============================================================
+       SEÇÃO 1 – HERO
+       ============================================================ */
+    .hero {
+      text-align: center;
+      padding-top: 90px;
+      padding-bottom: 90px;
+      background:
+        radial-gradient(1200px 500px at 50% -10%, rgba(245,197,24,0.10), transparent 60%),
+        var(--bg);
+    }
+    .hero h1 {
+      font-size: clamp(30px, 5.2vw, 52px);
+      font-weight: 800;
+      margin-bottom: 24px;
+    }
+    .hero .sub {
+      font-size: clamp(16px, 2.4vw, 20px);
+      color: var(--muted);
+      max-width: 680px;
+      margin: 0 auto 40px;
+    }
+    .hero .below-btn {
+      margin-top: 20px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    /* ============================================================
+       SEÇÃO 2 – "ISSO É PRA VOCÊ SE…"
+       ============================================================ */
+    .for-you { background: var(--bg-alt); }
+    .for-you h2 {
+      font-size: clamp(24px, 4vw, 34px);
+      font-weight: 700;
+      margin-bottom: 36px;
+      text-align: center;
+    }
+    .for-you ul { list-style: none; max-width: 620px; margin: 0 auto; }
+    .for-you li {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      font-size: 18px;
+      color: var(--text);
+      padding: 16px 0;
+      border-bottom: 1px solid var(--card-line);
+    }
+    .for-you li:last-child { border-bottom: none; }
+    .for-you li .icon {
+      color: var(--gold);
+      flex-shrink: 0;
+      font-size: 20px;
+      line-height: 1.5;
+    }
+
+    /* ============================================================
+       SEÇÃO 3 – PARTE INTERATIVA (CHECKLIST)
+       ============================================================ */
+    .signals-section h2 {
+      font-size: clamp(24px, 4vw, 34px);
+      font-weight: 700;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .signals-section .section-sub {
+      color: var(--muted);
+      font-size: 17px;
+      text-align: center;
+      max-width: 620px;
+      margin: 0 auto 44px;
+    }
+
+    /* Cada item do checklist é um <label> clicável inteiro */
+    .signal-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      background: var(--card);
+      border: 1px solid var(--card-line);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      margin-bottom: 14px;
+      cursor: pointer;
+      transition: border-color 0.15s ease, background 0.15s ease;
+      user-select: none;
+    }
+    .signal-item:hover { border-color: var(--gold); }
+    .signal-item.checked {
+      border-color: var(--gold);
+      background: rgba(245,197,24,0.06);
+    }
+
+    /* Checkbox custom, grande e fácil de clicar no mobile */
+    .signal-item input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 26px;
+      height: 26px;
+      min-width: 26px;
+      border: 2px solid var(--card-line);
+      border-radius: 8px;
+      background: transparent;
+      cursor: pointer;
+      position: relative;
+      margin-top: 2px;
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+    .signal-item input[type="checkbox"]:checked {
+      background: var(--gold);
+      border-color: var(--gold);
+    }
+    .signal-item input[type="checkbox"]:checked::after {
+      content: "";
+      position: absolute;
+      left: 8px;
+      top: 3px;
+      width: 6px;
+      height: 12px;
+      border: solid var(--dark-text);
+      border-width: 0 3px 3px 0;
+      transform: rotate(45deg);
+    }
+    .signal-item .signal-text { font-size: 17px; color: var(--text); }
+
+    /* Contador + texto dinâmico */
+    .counter-box {
+      margin-top: 40px;
+      background: var(--card);
+      border: 1px solid var(--card-line);
+      border-radius: var(--radius);
+      padding: 32px 28px;
+      text-align: center;
+    }
+    .counter-box .count-line {
+      font-size: clamp(22px, 4vw, 30px);
+      font-weight: 800;
+      margin-bottom: 14px;
+    }
+    .counter-box .count-line #signalCount { color: var(--gold); }
+    .counter-box .dynamic-text {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    /* ============================================================
+       SEÇÃO 4 – 7 AJUSTES RÁPIDOS
+       ============================================================ */
+    .adjustments-section { background: var(--bg-alt); }
+    .adjustments-section h2 {
+      font-size: clamp(24px, 4vw, 34px);
+      font-weight: 700;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .adjustments-section .section-sub {
+      color: var(--muted);
+      font-size: 17px;
+      text-align: center;
+      max-width: 640px;
+      margin: 0 auto 48px;
+    }
+    .adjust-card {
+      background: var(--card);
+      border: 1px solid var(--card-line);
+      border-radius: var(--radius);
+      padding: 26px 26px;
+      margin-bottom: 18px;
+    }
+    .adjust-card h3 {
+      font-size: 19px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+    .adjust-card h3 .num {
+      color: var(--gold);
+      font-size: 22px;
+      font-weight: 800;
+    }
+    .adjust-card p { color: var(--muted); font-size: 16px; }
+
+    .adjust-closing {
+      margin-top: 36px;
+      text-align: center;
+      font-size: 19px;
+      font-weight: 500;
+      color: var(--text);
+      max-width: 640px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .adjust-closing strong { color: var(--gold); }
+
+    /* ============================================================
+       SEÇÃO 5 – CTA / WHATSAPP
+       ============================================================ */
+    .cta-section {
+      text-align: center;
+      background:
+        radial-gradient(900px 400px at 50% 120%, rgba(245,197,24,0.10), transparent 60%),
+        var(--bg);
+    }
+    .cta-section h2 {
+      font-size: clamp(24px, 4vw, 36px);
+      font-weight: 800;
+      margin-bottom: 24px;
+    }
+    .cta-section p {
+      color: var(--muted);
+      font-size: 18px;
+      max-width: 640px;
+      margin: 0 auto 16px;
+    }
+    .cta-section .btn { margin-top: 24px; }
+
+    /* ============================================================
+       SEÇÃO 6 – QUEM SOU EU
+       ============================================================ */
+    .about-section { background: var(--bg-alt); }
+    .about-section h2 {
+      font-size: clamp(24px, 4vw, 32px);
+      font-weight: 700;
+      margin-bottom: 32px;
+      text-align: center;
+    }
+    .about-inner {
+      display: flex;
+      gap: 28px;
+      align-items: flex-start;
+      background: var(--card);
+      border: 1px solid var(--card-line);
+      border-radius: var(--radius);
+      padding: 32px;
+    }
+    .about-avatar {
+      flex-shrink: 0;
+      width: 84px;
+      height: 84px;
+      border-radius: 50%;
+      background: var(--gold);
+      color: var(--dark-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 30px;
+    }
+    .about-text p { color: var(--muted); font-size: 16px; margin-bottom: 14px; }
+    .about-text p:last-child { margin-bottom: 0; }
+    .about-text .list { list-style: none; margin: 6px 0 14px; }
+    .about-text .list li {
+      color: var(--text);
+      font-size: 16px;
+      padding: 6px 0 6px 24px;
+      position: relative;
+    }
+    .about-text .list li::before {
+      content: "→";
+      position: absolute;
+      left: 0;
+      color: var(--gold);
+      font-weight: 700;
+    }
+    .about-text strong { color: var(--text); }
+
+    /* ============================================================
+       SEÇÃO 7 – RODAPÉ
+       ============================================================ */
+    footer {
+      padding: 40px 24px;
+      text-align: center;
+      border-top: 1px solid var(--card-line);
+      color: var(--muted);
+      font-size: 14px;
+    }
+    footer a { color: var(--gold); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+    footer .name { color: var(--text); font-weight: 600; margin-bottom: 8px; }
+
+    /* ============================================================
+       RESPONSIVO – MOBILE
+       ============================================================ */
+    @media (max-width: 640px) {
+      section { padding: 56px 20px; }
+      .hero { padding-top: 64px; padding-bottom: 64px; }
+      .about-inner { flex-direction: column; align-items: center; text-align: center; }
+      .about-text .list li { text-align: left; }
+      .btn { width: 100%; }         /* botões cheios e fáceis de tocar */
+      .for-you li { font-size: 16px; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- TODO: Meta Pixel - PageView / ViewContent (RaioxPlanejados) -->
+
+  <!-- ============================================================
+       TOPO – LOGO / NOME
+       ============================================================ -->
+  <header class="topbar">
+    <div class="logo">Igor Pacheco <span>· Planejados</span></div>
+  </header>
+
+  <!-- ============================================================
+       SEÇÃO 1 – HERO
+       ============================================================ -->
+  <section class="hero" id="hero">
+    <div class="container">
+      <span class="badge">Raio-X Gratuito · Móveis Planejados</span>
+      <h1>
+        Pare de perder tempo com <span class="gold-text">curioso</span>.<br>
+        Veja onde sua loja de planejados está <span class="gold-text">vazando projetos e dinheiro</span>.
+      </h1>
+      <p class="sub">
+        Em menos de 10 minutos, você identifica 7 pontos de vazamento de oportunidades
+        e descobre o que ajustar na captação e no atendimento pra fechar mais projetos
+        com os leads que você já tem — mesmo sem aumentar o investimento em anúncios.
+      </p>
+      <!-- Botão CTA: rola suavemente até a Seção 3 (parte interativa) -->
+      <button class="btn" id="heroCta">Fazer meu Raio-X agora</button>
+      <p class="below-btn">
+        Conteúdo gratuito · pensado só para donos e gestores de lojas de móveis planejados.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SEÇÃO 2 – "ISSO É PRA VOCÊ SE…"
+       ============================================================ -->
+  <section class="for-you" id="for-you">
+    <div class="container">
+      <h2>Este Raio-X é pra você se…</h2>
+      <ul>
+        <li><span class="icon">✓</span> Sua loja de planejados depende demais de indicação.</li>
+        <li><span class="icon">✓</span> Você responde orçamento no Whats e o cliente some.</li>
+        <li><span class="icon">✓</span> Você já investiu em anúncios, mas quase não viu projeto fechado.</li>
+        <li><span class="icon">✓</span> Você sente que poderia fechar mais projetos com a demanda que já tem hoje.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SEÇÃO 3 – PARTE INTERATIVA (CHECKLIST DOS 7 SINAIS)
+       ============================================================ -->
+  <section class="signals-section" id="signals-section">
+    <div class="container">
+      <h2>7 sinais de que você está perdendo projetos na sua loja</h2>
+      <p class="section-sub">
+        Marque os itens que acontecem hoje na sua loja de móveis planejados.
+        Não é teste psicológico, é dinheiro que está escapando todo mês.
+      </p>
+
+      <!-- Checklist: cada label é totalmente clicável -->
+      <div id="signalsList">
+        <label class="signal-item">
+          <input type="checkbox" class="signal-check">
+          <span class="signal-text">Respondo orçamento no Whats, mas não tenho rotina de follow-up.</span>
+        </label>
+        <label class="signal-item">
+          <input type="checkbox" class="signal-check">
+          <span class="signal-text">Atendo curioso e comprador do mesmo jeito.</span>
+        </label>
+        <label class="signal-item">
+          <input type="checkbox" class="signal-check">
+          <span class="signal-text">Não sei de onde vieram meus últimos 5 projetos fechados.</span>
+        </label>
+        <label class="signal-item">
+          <input type="checkbox" class="signal-check">
+          <span class="signal-text">Não acompanho quantos orçamentos viram projeto por mês.</span>
+        </label>
+        <label class="signal-item">
+          <input type="checkbox" class="signal-check">
+          <span class="signal-text">Meu Instagram/Google traz contato, mas quase ninguém fecha.</span>
+        </label>
+        <label class="signal-item">
+          <input type="checkbox" class="signal-check">
+          <span class="signal-text">Perco tempo montando projeto pra gente que some.</span>
+        </label>
+        <label class="signal-item">
+          <input type="checkbox" class="signal-check">
+          <span class="signal-text">Não tenho nenhum filtro antes de passar o lead pro comercial.</span>
+        </label>
+      </div>
+
+      <!-- Contador dinâmico + texto de leitura -->
+      <div class="counter-box">
+        <p class="count-line">Você marcou <span id="signalCount">0</span> de 7 sinais.</p>
+        <p class="dynamic-text" id="dynamicText">
+          Você já está melhor que a maioria, mas ainda tem dinheiro escapando em alguns pontos.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SEÇÃO 4 – 7 AJUSTES RÁPIDOS
+       ============================================================ -->
+  <section class="adjustments-section" id="adjustments-section">
+    <div class="container">
+      <h2>7 ajustes rápidos pra fechar mais projetos com os leads que você já tem</h2>
+      <p class="section-sub">
+        Aqui vão ajustes simples que você pode começar a aplicar hoje, sem mexer no valor de
+        anúncio — só organizando melhor sua captação e seu atendimento.
+      </p>
+
+      <!-- Ajuste 1 -->
+      <div class="adjust-card">
+        <h3><span class="num">1.</span> Pergunta-filtro logo no primeiro contato</h3>
+        <p>
+          Em vez de responder orçamento direto, comece perguntando coisas como:
+          “Pra quando é a obra?” e “Você já tem projeto de arquitetura?”. Isso separa
+          quem está só curioso de quem realmente tem prazo e intenção de fechar.
+        </p>
+      </div>
+
+      <!-- Ajuste 2 -->
+      <div class="adjust-card">
+        <h3><span class="num">2.</span> Regra do orçamento com contexto antes de preço</h3>
+        <p>
+          Antes de falar em valores, entenda o tipo de ambiente, prazo, estilo e restrições
+          do cliente. Quanto mais contexto você tiver, mais fácil é mostrar valor — e menos
+          você vira só “o preço mais barato”.
+        </p>
+      </div>
+
+      <!-- Ajuste 3 -->
+      <div class="adjust-card">
+        <h3><span class="num">3.</span> Rotina de follow-up em 3 toques</h3>
+        <p>
+          Não dependa do “se ele quiser, ele volta”. Crie uma rotina simples:
+          Dia 1: mensagem de reforço + dúvida. Dia 3: lembrete com benefício claro.
+          Dia 7: última chamada elegante pra não deixar o projeto morrer em silêncio.
+        </p>
+      </div>
+
+      <!-- Ajuste 4 -->
+      <div class="adjust-card">
+        <h3><span class="num">4.</span> Separar lead frio de lead quente na sua agenda</h3>
+        <p>
+          Use etiquetas ou grupos no Whats/CRM pra separar quem está “só pesquisando” de
+          quem está com obra em andamento. Assim você foca tempo e energia em quem tem mais
+          chance de fechar agora.
+        </p>
+      </div>
+
+      <!-- Ajuste 5 -->
+      <div class="adjust-card">
+        <h3><span class="num">5.</span> Pergunta de comprometimento antes de montar o projeto</h3>
+        <p>
+          Antes de gastar tempo fazendo um projeto completo, pergunte algo como:
+          “Se fizer sentido pra você, você consegue decidir esse projeto nos próximos X dias?”.
+          Isso filtra curioso e coloca o cliente em posição de compromisso.
+        </p>
+      </div>
+
+      <!-- Ajuste 6 -->
+      <div class="adjust-card">
+        <h3><span class="num">6.</span> Encerramento com próxima ação definida</h3>
+        <p>
+          Nunca termine a conversa só com “qualquer coisa me chama”. Sempre feche com um
+          próximo passo claro: visita na loja, reunião por vídeo, retorno em data específica.
+          Quem não tem próxima ação definida some mais fácil.
+        </p>
+      </div>
+
+      <!-- Ajuste 7 -->
+      <div class="adjust-card">
+        <h3><span class="num">7.</span> Registro simples: Leads / Orçamentos / Projetos fechados</h3>
+        <p>
+          Tenha pelo menos um controle básico com 3 colunas: quantos leads chegaram, quantos
+          orçamentos foram enviados, quantos viraram projeto. Esse controle mínimo já mostra
+          onde está o gargalo e onde mexer primeiro.
+        </p>
+      </div>
+
+      <p class="adjust-closing">
+        Se você aplicar só <strong>2 ou 3</strong> desses ajustes, já vai sentir diferença no
+        número de projetos fechados com os leads que JÁ chegam na sua loja hoje.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SEÇÃO 5 – CTA / MINI-DIAGNÓSTICO → WHATSAPP
+       ============================================================ -->
+  <section class="cta-section" id="cta-section">
+    <div class="container">
+      <h2>Quer que eu olhe pro Raio-X da sua loja?</h2>
+      <p>
+        Se você se identificou com esse cenário e quer ver como isso poderia virar um sistema
+        de clientes de verdade — com anúncios, funil e qualificação — me chama no Whats.
+      </p>
+      <p>
+        Vou olhar pro seu caso, te dizer onde eu vejo mais potencial de ganho e, se fizer
+        sentido pros dois lados, te explico como funciona o Método Projeto Fechado na prática.
+      </p>
+      <!-- Botão abre o WhatsApp em nova aba com mensagem pré-preenchida -->
+      <a class="btn"
+         id="whatsBtn"
+         href="https://wa.me/5553999972327?text=Oi%20Igor,%20acabei%20de%20fazer%20o%20Raio-X%20de%20Clientes%20e%20quero%20que%20você%20olhe%20pra%20minha%20loja."
+         target="_blank"
+         rel="noopener">
+        Falar comigo sobre o Raio-X da minha loja
+      </a>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SEÇÃO 6 – QUEM SOU EU
+       ============================================================ -->
+  <section class="about-section" id="about-section">
+    <div class="container">
+      <h2>Quem está por trás deste Raio-X</h2>
+      <div class="about-inner">
+        <!-- Avatar genérico com iniciais -->
+        <div class="about-avatar">IP</div>
+        <div class="about-text">
+          <p>
+            Eu sou o <strong>Igor Pacheco</strong> e trabalho só com lojas de móveis planejados,
+            montando sistemas de captação que trazem projetos fechados todo mês, e não só
+            curioso no Whats.
+          </p>
+          <p>O que eu faço não é “só tráfego”. Eu ajudo a sua loja a:</p>
+          <ul class="list">
+            <li>atrair pessoas que estão com obra, reforma ou mudança em andamento,</li>
+            <li>filtrar curioso antes de chegar na sua equipe,</li>
+            <li>e organizar o atendimento pra aumentar o número de projetos fechados com previsibilidade.</li>
+          </ul>
+          <p>
+            Este Raio-X é uma parte da visão que eu aplico no <strong>Método Projeto Fechado</strong>,
+            o sistema completo de clientes que implemento nas lojas que atendo.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SEÇÃO 7 – RODAPÉ
+       ============================================================ -->
+  <footer>
+    <div class="name">Igor Pacheco – Sistema de Clientes para Lojas de Planejados</div>
+    <a href="https://igorpachecoads.com.br" target="_blank" rel="noopener">igorpachecoads.com.br</a>
+  </footer>
+
+  <!-- ============================================================
+       SCRIPT – INTERATIVIDADE
+       ============================================================ -->
+  <script>
+    /* ----------------------------------------------------------
+       1) ROLAGEM SUAVE: botão do hero → seção interativa (Seção 3)
+       ---------------------------------------------------------- */
+    var heroCta = document.getElementById('heroCta');
+    heroCta.addEventListener('click', function () {
+      // TODO: Meta Pixel - trackCustom('RaioxPlanejados_Start')
+      var target = document.getElementById('signals-section');
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    /* ----------------------------------------------------------
+       2) CHECKLIST: contagem dinâmica + texto de leitura
+       ---------------------------------------------------------- */
+    var checks       = document.querySelectorAll('.signal-check');
+    var countEl      = document.getElementById('signalCount');
+    var dynamicTextEl = document.getElementById('dynamicText');
+
+    // Controle para disparar o evento de "engajamento" só na 1ª marcação
+    var engagedFired = false;
+
+    // Textos de leitura conforme a quantidade de sinais marcados
+    function getDynamicText(count) {
+      if (count <= 2) {
+        return 'Você já está melhor que a maioria, mas ainda tem dinheiro escapando em alguns pontos.';
+      } else if (count <= 5) {
+        return 'Você está perdendo uma quantidade considerável de projetos todo mês por causa desses vazamentos.';
+      } else {
+        return 'Seu comercial e sua captação estão vazando dinheiro em vários pontos. Qualquer anúncio que você fizer hoje tende a vazar junto.';
+      }
+    }
+
+    // Recalcula a contagem e atualiza a interface
+    function updateSignals() {
+      var count = 0;
+      checks.forEach(function (chk) {
+        // Realça visualmente o card marcado
+        var card = chk.closest('.signal-item');
+        if (chk.checked) {
+          count++;
+          card.classList.add('checked');
+        } else {
+          card.classList.remove('checked');
+        }
+      });
+
+      // Atualiza contador e texto dinâmico em tempo real
+      countEl.textContent = count;
+      dynamicTextEl.textContent = getDynamicText(count);
+
+      // Dispara evento de engajamento na 1ª vez que marcar >= 1
+      if (count >= 1 && !engagedFired) {
+        engagedFired = true;
+        // TODO: Meta Pixel - trackCustom('RaioxPlanejados_Engaged')
+      }
+    }
+
+    // Ouve mudanças em cada checkbox
+    checks.forEach(function (chk) {
+      chk.addEventListener('change', updateSignals);
+    });
+
+    /* ----------------------------------------------------------
+       3) BOTÃO DO WHATSAPP
+       ---------------------------------------------------------- */
+    var whatsBtn = document.getElementById('whatsBtn');
+    whatsBtn.addEventListener('click', function () {
+      // TODO: Meta Pixel - trackCustom('RaioxPlanejados_WhatsClick')
+      // O link já abre o WhatsApp em nova aba (target="_blank"), então
+      // não é necessário prevenir o comportamento padrão aqui.
+    });
+  </script>
+</body>
+</html>
