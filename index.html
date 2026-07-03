@@ -97,22 +97,6 @@
     .btn:active { transform: translateY(0); }
 
     /* ============================================================
-       TOPO / LOGO
-       ============================================================ */
-    .topbar {
-      padding: 22px 24px;
-      border-bottom: 1px solid var(--card-line);
-    }
-    .topbar .logo {
-      max-width: var(--max);
-      margin: 0 auto;
-      font-weight: 700;
-      font-size: 16px;
-      letter-spacing: 0.02em;
-    }
-    .topbar .logo span { color: var(--gold); }
-
-    /* ============================================================
        SEÇÃO 1 – HERO
        ============================================================ */
     .hero {
@@ -364,6 +348,15 @@
       font-weight: 800;
       font-size: 30px;
     }
+    /* Foto real (redonda, recortada) */
+    .about-photo {
+      flex-shrink: 0;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--gold);
+    }
     .about-text p { color: var(--muted); font-size: 16px; margin-bottom: 14px; }
     .about-text p:last-child { margin-bottom: 0; }
     .about-text .list { list-style: none; margin: 6px 0 14px; }
@@ -412,13 +405,6 @@
 
 <body>
   <!-- TODO: Meta Pixel - PageView / ViewContent (RaioxPlanejados) -->
-
-  <!-- ============================================================
-       TOPO – LOGO / NOME
-       ============================================================ -->
-  <header class="topbar">
-    <div class="logo">Igor Pacheco <span>· Planejados</span></div>
-  </header>
 
   <!-- ============================================================
        SEÇÃO 1 – HERO
@@ -631,8 +617,9 @@
     <div class="container">
       <h2>Quem está por trás deste Raio-X</h2>
       <div class="about-inner">
-        <!-- Avatar genérico com iniciais -->
-        <div class="about-avatar">IP</div>
+        <!-- Foto do Igor. Caso o arquivo não seja encontrado, cai no avatar de iniciais. -->
+        <img class="about-photo" src="assets/igor.jpg" alt="Foto de Igor Pacheco"
+             onerror="this.outerHTML='&lt;div class=&quot;about-avatar&quot;&gt;IP&lt;/div&gt;'">
         <div class="about-text">
           <p>
             Eu sou o <strong>Igor Pacheco</strong> e trabalho só com lojas de móveis planejados,
@@ -659,7 +646,6 @@
        ============================================================ -->
   <footer>
     <div class="name">Igor Pacheco – Sistema de Clientes para Lojas de Planejados</div>
-    <a href="https://igorpachecoads.com.br" target="_blank" rel="noopener">igorpachecoads.com.br</a>
   </footer>
 
   <!-- ============================================================
