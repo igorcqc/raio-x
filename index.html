@@ -172,6 +172,13 @@
       margin-bottom: 36px;
       text-align: center;
     }
+    .for-you .section-lead {
+      color: var(--muted);
+      font-size: 17px;
+      text-align: center;
+      max-width: 560px;
+      margin: 0 auto 32px;
+    }
     .for-you ul { list-style: none; max-width: 620px; margin: 0 auto; }
     .for-you li {
       display: flex;
@@ -245,6 +252,12 @@
     .signal-item input[type="checkbox"]:checked {
       background: var(--gold);
       border-color: var(--gold);
+    }
+    /* appearance:none remove o contorno nativo de foco do teclado;
+       repõe um contorno visível para navegação por Tab. */
+    .signal-item input[type="checkbox"]:focus-visible {
+      outline: 2px solid var(--gold);
+      outline-offset: 2px;
     }
     .signal-item input[type="checkbox"]:checked::after {
       content: "";
@@ -451,7 +464,7 @@
     <div class="container">
       <span class="badge">Raio-X Gratuito · Móveis Planejados</span>
       <h1>
-        Pare de perder tempo com <span class="gold-text">curioso</span>.<br>
+        Pare de perder tempo com <span class="gold-text">curiosos</span>.<br>
         Veja onde sua loja de planejados está <span class="gold-text">vazando projetos e dinheiro</span>.
       </h1>
       <p class="sub">
@@ -473,9 +486,13 @@
   <section class="for-you" id="for-you">
     <div class="container">
       <h2>Este Raio-X é pra você se…</h2>
+      <p class="section-lead">
+        Se pelo menos um destes pontos descreve sua loja hoje, continue —
+        o restante desta página foi pensado pra sua realidade.
+      </p>
       <ul>
         <li><span class="icon">✓</span> Sua loja de planejados depende demais de indicação.</li>
-        <li><span class="icon">✓</span> Você responde orçamento no Whats e o cliente some.</li>
+        <li><span class="icon">✓</span> Você sente que está deixando dinheiro na mesa com os leads que já chegam.</li>
         <li><span class="icon">✓</span> Você já investiu em anúncios, mas quase não viu projeto fechado.</li>
         <li><span class="icon">✓</span> Você sente que poderia fechar mais projetos com a demanda que já tem hoje.</li>
       </ul>
@@ -493,33 +510,36 @@
         Não é teste psicológico, é dinheiro que está escapando todo mês.
       </p>
 
-      <!-- Checklist: cada label é totalmente clicável -->
+      <!-- Checklist: cada label é totalmente clicável.
+           data-pillar categoriza o sinal em um dos 3 pilares do
+           diagnóstico (ver PILLARS no script): captacao, atendimento
+           ou processo. Usado para calcular o ponto mais frágil. -->
       <div id="signalsList">
-        <label class="signal-item">
+        <label class="signal-item" data-pillar="processo">
           <input type="checkbox" class="signal-check">
           <span class="signal-text">Respondo orçamento no Whats, mas não tenho rotina de follow-up.</span>
         </label>
-        <label class="signal-item">
+        <label class="signal-item" data-pillar="atendimento">
           <input type="checkbox" class="signal-check">
           <span class="signal-text">Atendo curioso e comprador do mesmo jeito.</span>
         </label>
-        <label class="signal-item">
+        <label class="signal-item" data-pillar="captacao">
           <input type="checkbox" class="signal-check">
           <span class="signal-text">Não sei de onde vieram meus últimos 5 projetos fechados.</span>
         </label>
-        <label class="signal-item">
+        <label class="signal-item" data-pillar="processo">
           <input type="checkbox" class="signal-check">
           <span class="signal-text">Não acompanho quantos orçamentos viram projeto por mês.</span>
         </label>
-        <label class="signal-item">
+        <label class="signal-item" data-pillar="captacao">
           <input type="checkbox" class="signal-check">
           <span class="signal-text">Meu Instagram/Google traz contato, mas quase ninguém fecha.</span>
         </label>
-        <label class="signal-item">
+        <label class="signal-item" data-pillar="processo">
           <input type="checkbox" class="signal-check">
           <span class="signal-text">Perco tempo montando projeto pra gente que some.</span>
         </label>
-        <label class="signal-item">
+        <label class="signal-item" data-pillar="atendimento">
           <input type="checkbox" class="signal-check">
           <span class="signal-text">Não tenho nenhum filtro antes de passar o lead pro comercial.</span>
         </label>
@@ -703,17 +723,27 @@
     });
 
     /* ----------------------------------------------------------
-       2) CHECKLIST: contagem dinâmica + texto de leitura
+       2) CHECKLIST: contagem dinâmica + diagnóstico por pilar
        ---------------------------------------------------------- */
-    var checks       = document.querySelectorAll('.signal-check');
-    var countEl      = document.getElementById('signalCount');
+    var checks        = document.querySelectorAll('.signal-check');
+    var countEl       = document.getElementById('signalCount');
     var dynamicTextEl = document.getElementById('dynamicText');
+    var whatsBtn      = document.getElementById('whatsBtn');
 
     // Controle para disparar o evento de "engajamento" só na 1ª marcação
     var engagedFired = false;
 
-    // Textos de leitura conforme a quantidade de sinais marcados
-    function getDynamicText(count) {
+    // Os 7 sinais se agrupam em 3 pilares do negócio. "max" é quantos
+    // sinais existem em cada pilar (usado para comparar proporção, não
+    // valor bruto, já que os pilares têm tamanhos diferentes).
+    var PILLARS = {
+      captacao:    { label: 'Captação',    max: 2, desc: 'de onde vêm seus leads e se chegam qualificados' },
+      atendimento: { label: 'Atendimento', max: 2, desc: 'como você separa curioso de quem tem intenção real' },
+      processo:    { label: 'Processo',    max: 3, desc: 'sua rotina de follow-up e controle de números' }
+    };
+
+    // Textos de severidade conforme a quantidade total de sinais marcados
+    function getSeverityText(count) {
       if (count <= 2) {
         return 'Você já está melhor que a maioria, mas ainda tem dinheiro escapando em alguns pontos.';
       } else if (count <= 5) {
@@ -723,23 +753,87 @@
       }
     }
 
-    // Recalcula a contagem e atualiza a interface
+    // Encontra o(s) pilar(es) proporcionalmente mais marcado(s).
+    // Compara por proporção (marcados / total do pilar), não valor bruto,
+    // pra não favorecer o pilar "processo" só por ter mais itens (3 vs 2).
+    function getTopPillars(pillarCounts) {
+      var topRatio = 0;
+      var topKeys = [];
+      Object.keys(PILLARS).forEach(function (key) {
+        var ratio = pillarCounts[key] / PILLARS[key].max;
+        if (ratio > topRatio) {
+          topRatio = ratio;
+          topKeys = [key];
+        } else if (ratio === topRatio && ratio > 0) {
+          topKeys.push(key);
+        }
+      });
+      return topKeys;
+    }
+
+    // Junta uma lista em português: "A", "A e B", "A, B e C"
+    function joinPtBr(labels) {
+      if (labels.length <= 1) return labels.join('');
+      return labels.slice(0, -1).join(', ') + ' e ' + labels[labels.length - 1];
+    }
+
+    // Sentença extra citando o(s) pilar(es) mais frágil(eis) (HTML, com destaque dourado)
+    function getPillarSentenceHTML(pillarCounts, count) {
+      if (count === 0) return '';
+      var topKeys = getTopPillars(pillarCounts);
+      if (topKeys.length === 0) return '';
+
+      var labels = topKeys.map(function (k) { return PILLARS[k].label; });
+      if (topKeys.length === 1) {
+        var p = PILLARS[topKeys[0]];
+        return ' O ponto mais frágil agora é <strong class="gold-text">' + p.label + '</strong> — ' + p.desc + '.';
+      }
+      return ' Os pontos mais frágeis agora são <strong class="gold-text">' + joinPtBr(labels) + '</strong>.';
+    }
+
+    // Sentença extra citando o(s) pilar(es) mais frágil(eis) (texto puro, pra mensagem do Whats)
+    function getPillarSentencePlain(pillarCounts, count) {
+      if (count === 0) return '';
+      var topKeys = getTopPillars(pillarCounts);
+      if (topKeys.length === 0) return '';
+      var labels = topKeys.map(function (k) { return PILLARS[k].label; });
+      return ', principalmente em ' + joinPtBr(labels);
+    }
+
+    // Monta a mensagem pré-preenchida do WhatsApp com o resultado do Raio-X
+    function buildWhatsAppMessage(count, pillarCounts) {
+      if (count === 0) {
+        return 'Oi Igor, acabei de fazer o Raio-X de Clientes e quero saber mais sobre o Método Projeto Fechado.';
+      }
+      return 'Oi Igor, acabei de fazer o Raio-X de Clientes. Marquei ' + count + ' de 7 sinais' +
+        getPillarSentencePlain(pillarCounts, count) + '. Quero saber mais sobre o Método Projeto Fechado.';
+    }
+
+    // Recalcula a contagem (total e por pilar) e atualiza a interface
     function updateSignals() {
       var count = 0;
+      var pillarCounts = { captacao: 0, atendimento: 0, processo: 0 };
+
       checks.forEach(function (chk) {
-        // Realça visualmente o card marcado
         var card = chk.closest('.signal-item');
         if (chk.checked) {
           count++;
           card.classList.add('checked');
+          var pillar = card.dataset.pillar;
+          if (pillarCounts.hasOwnProperty(pillar)) pillarCounts[pillar]++;
         } else {
           card.classList.remove('checked');
         }
       });
 
-      // Atualiza contador e texto dinâmico em tempo real
+      // Atualiza contador e diagnóstico (severidade + pilar mais frágil)
       countEl.textContent = count;
-      dynamicTextEl.textContent = getDynamicText(count);
+      dynamicTextEl.innerHTML = getSeverityText(count) + getPillarSentenceHTML(pillarCounts, count);
+
+      // Atualiza a mensagem pré-preenchida do WhatsApp com o resultado atual,
+      // pra chegar até o Igor já com contexto de qualificação do lead
+      whatsBtn.href = 'https://wa.me/5553999972327?text=' +
+        encodeURIComponent(buildWhatsAppMessage(count, pillarCounts));
 
       // Dispara evento de engajamento na 1ª vez que marcar >= 1
       if (count >= 1 && !engagedFired) {
@@ -753,10 +847,12 @@
       chk.addEventListener('change', updateSignals);
     });
 
+    // Sincroniza o estado inicial (contador, texto e link do Whats com count=0)
+    updateSignals();
+
     /* ----------------------------------------------------------
        3) BOTÃO DO WHATSAPP
        ---------------------------------------------------------- */
-    var whatsBtn = document.getElementById('whatsBtn');
     whatsBtn.addEventListener('click', function () {
       // TODO: Meta Pixel - trackCustom('RaioxPlanejados_WhatsClick')
       // O link já abre o WhatsApp em nova aba (target="_blank"), então
