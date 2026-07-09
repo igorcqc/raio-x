@@ -1,0 +1,7 @@
+{
+  "name": "raio-x",
+  "private": true,
+  "engines": {
+    "node": "20.x"
+  }
+}

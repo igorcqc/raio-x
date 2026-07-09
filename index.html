@@ -488,7 +488,7 @@
 </head>
 
 <body>
-  <!-- Meta Pixel - código base + PageView/ViewContent -->
+  <!-- Meta Pixel (navegador) - código base -->
   <script>
     !function(f,b,e,v,n,t,s)
     {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -499,8 +499,89 @@
     s.parentNode.insertBefore(t,s)}(window, document,'script',
     'https://connect.facebook.net/en_US/fbevents.js');
     fbq('init', '2432882797138980');
-    fbq('track', 'PageView');
-    fbq('track', 'ViewContent');
+
+    /* ----------------------------------------------------------
+       RASTREAMENTO DUPLO: Pixel (navegador) + Conversions API
+       (servidor), disparados juntos com o mesmo event_id, para o
+       Meta deduplicar. O servidor manda parâmetros extras (IP,
+       user-agent) que o navegador não expõe, melhorando a
+       qualidade de correspondência (EQM) mesmo sem formulário
+       nesta página (sem e-mail/telefone disponíveis).
+       ---------------------------------------------------------- */
+    function raioxUuid() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = (Math.random() * 16) | 0;
+        var v = c === 'x' ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+      });
+    }
+
+    function raioxGetCookie(name) {
+      var match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+      return match ? decodeURIComponent(match[1]) : null;
+    }
+
+    // ID anônimo persistente (não é PII), usado como external_id
+    // para ajudar o Meta a ligar eventos da mesma pessoa ao longo do tempo.
+    function raioxGetExternalId() {
+      var key = 'raiox_ext_id';
+      var id = null;
+      try { id = localStorage.getItem(key); } catch (e) {}
+      if (!id) {
+        id = raioxUuid();
+        try { localStorage.setItem(key, id); } catch (e) {}
+      }
+      return id;
+    }
+
+    // _fbc normalmente é setado pelo próprio Pixel quando o visitante chega
+    // por um anúncio (via fbclid na URL). Antes desse cookie existir,
+    // montamos o valor manualmente a partir da URL (formato documentado
+    // pela Meta: fb.1.<timestamp>.<fbclid>).
+    function raioxGetOrBuildFbc() {
+      var fbc = raioxGetCookie('_fbc');
+      if (fbc) return fbc;
+      var params = new URLSearchParams(window.location.search);
+      var fbclid = params.get('fbclid');
+      return fbclid ? ('fb.1.' + Date.now() + '.' + fbclid) : null;
+    }
+
+    // Envia o evento pro back-end (api/track), que repassa pra Conversions
+    // API com IP e user-agent do servidor. sendBeacon garante o envio
+    // mesmo que o clique abra outra aba (ex.: botão do WhatsApp) e a
+    // página perca o foco logo em seguida.
+    function raioxSendServerEvent(eventName, eventId, customData) {
+      var payload = JSON.stringify({
+        event_name: eventName,
+        event_id: eventId,
+        event_source_url: window.location.href,
+        fbp: raioxGetCookie('_fbp'),
+        fbc: raioxGetOrBuildFbc(),
+        external_id: raioxGetExternalId(),
+        custom_data: customData || {}
+      });
+      try {
+        if (navigator.sendBeacon) {
+          navigator.sendBeacon('/api/track', new Blob([payload], { type: 'application/json' }));
+        } else {
+          fetch('/api/track', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload, keepalive: true });
+        }
+      } catch (e) {
+        // Rastreamento nunca deve quebrar a experiência da página.
+      }
+    }
+
+    // Dispara o mesmo evento no navegador (Pixel) e no servidor (CAPI),
+    // com o mesmo event_id, para o Meta deduplicar automaticamente.
+    function raioxTrack(isStandardEvent, eventName, customData) {
+      var eventId = raioxUuid();
+      fbq(isStandardEvent ? 'track' : 'trackCustom', eventName, customData || {}, { eventID: eventId });
+      raioxSendServerEvent(eventName, eventId, customData);
+    }
+
+    var RAIOX_CONTENT = { content_name: 'Raio-X de Clientes - Móveis Planejados', content_category: 'lead_magnet' };
+    raioxTrack(true, 'PageView');
+    raioxTrack(true, 'ViewContent', RAIOX_CONTENT);
   </script>
   <noscript><img height="1" width="1" style="display:none"
     src="https://www.facebook.com/tr?id=2432882797138980&ev=PageView&noscript=1"
@@ -792,7 +873,7 @@
        ---------------------------------------------------------- */
     var heroCta = document.getElementById('heroCta');
     heroCta.addEventListener('click', function () {
-      fbq('trackCustom', 'RaioxPlanejados_Start');
+      raioxTrack(false, 'RaioxPlanejados_Start', RAIOX_CONTENT);
       var target = document.getElementById('signals-section');
       target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
@@ -807,6 +888,11 @@
 
     // Controle para disparar o evento de "engajamento" só na 1ª marcação
     var engagedFired = false;
+
+    // Guarda o último resultado do checklist, pra anexar ao evento
+    // de clique no WhatsApp (que acontece fora do escopo de updateSignals)
+    var lastCount = 0;
+    var lastPillarCounts = { captacao: 0, atendimento: 0, processo: 0 };
 
     // Os 7 sinais se agrupam em 3 pilares do negócio. "max" é quantos
     // sinais existem em cada pilar (usado para comparar proporção, não
@@ -910,10 +996,14 @@
       whatsBtn.href = 'https://wa.me/5553999972327?text=' +
         encodeURIComponent(buildWhatsAppMessage(count, pillarCounts));
 
+      // Persiste o resultado atual pra usar depois, no clique do WhatsApp
+      lastCount = count;
+      lastPillarCounts = pillarCounts;
+
       // Dispara evento de engajamento na 1ª vez que marcar >= 1
       if (count >= 1 && !engagedFired) {
         engagedFired = true;
-        fbq('trackCustom', 'RaioxPlanejados_Engaged');
+        raioxTrack(false, 'RaioxPlanejados_Engaged', RAIOX_CONTENT);
       }
     }
 
@@ -929,7 +1019,19 @@
        3) BOTÃO DO WHATSAPP
        ---------------------------------------------------------- */
     whatsBtn.addEventListener('click', function () {
-      fbq('trackCustom', 'RaioxPlanejados_WhatsClick');
+      var weakestPillars = getTopPillars(lastPillarCounts).map(function (k) { return PILLARS[k].label; });
+      var whatsCustomData = {
+        content_name: RAIOX_CONTENT.content_name,
+        content_category: RAIOX_CONTENT.content_category,
+        signals_marked: lastCount,
+        signals_total: 7,
+        weakest_pillars: weakestPillars.join(', ') || 'nenhum'
+      };
+      // Evento customizado (nomenclatura própria do funil) + evento
+      // padrão 'Lead' (a Meta otimiza campanhas melhor com eventos
+      // padrão do que só com customizados)
+      raioxTrack(false, 'RaioxPlanejados_WhatsClick', whatsCustomData);
+      raioxTrack(true, 'Lead', whatsCustomData);
       // O link já abre o WhatsApp em nova aba (target="_blank"), então
       // não é necessário prevenir o comportamento padrão aqui.
     });
