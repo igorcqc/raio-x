@@ -488,7 +488,23 @@
 </head>
 
 <body>
-  <!-- TODO: Meta Pixel - PageView / ViewContent (RaioxPlanejados) -->
+  <!-- Meta Pixel - código base + PageView/ViewContent -->
+  <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '2432882797138980');
+    fbq('track', 'PageView');
+    fbq('track', 'ViewContent');
+  </script>
+  <noscript><img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id=2432882797138980&ev=PageView&noscript=1"
+  /></noscript>
 
   <!-- Landmark <main> engloba todo o conteúdo da página (fora do rodapé),
        necessário para leitores de tela e para a árvore de acessibilidade
@@ -776,7 +792,7 @@
        ---------------------------------------------------------- */
     var heroCta = document.getElementById('heroCta');
     heroCta.addEventListener('click', function () {
-      // TODO: Meta Pixel - trackCustom('RaioxPlanejados_Start')
+      fbq('trackCustom', 'RaioxPlanejados_Start');
       var target = document.getElementById('signals-section');
       target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
@@ -897,7 +913,7 @@
       // Dispara evento de engajamento na 1ª vez que marcar >= 1
       if (count >= 1 && !engagedFired) {
         engagedFired = true;
-        // TODO: Meta Pixel - trackCustom('RaioxPlanejados_Engaged')
+        fbq('trackCustom', 'RaioxPlanejados_Engaged');
       }
     }
 
@@ -913,7 +929,7 @@
        3) BOTÃO DO WHATSAPP
        ---------------------------------------------------------- */
     whatsBtn.addEventListener('click', function () {
-      // TODO: Meta Pixel - trackCustom('RaioxPlanejados_WhatsClick')
+      fbq('trackCustom', 'RaioxPlanejados_WhatsClick');
       // O link já abre o WhatsApp em nova aba (target="_blank"), então
       // não é necessário prevenir o comportamento padrão aqui.
     });
