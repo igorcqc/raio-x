@@ -1027,11 +1027,10 @@
         signals_total: 7,
         weakest_pillars: weakestPillars.join(', ') || 'nenhum'
       };
-      // Evento customizado (nomenclatura própria do funil) + evento
-      // padrão 'Lead' (a Meta otimiza campanhas melhor com eventos
-      // padrão do que só com customizados)
+      // Só o evento customizado deste funil. O evento padrão 'Lead' da
+      // Meta fica reservado para o formulário em outra página, onde a
+      // qualificação é inequívoca (e há e-mail/telefone pra um EQM maior).
       raioxTrack(false, 'RaioxPlanejados_WhatsClick', whatsCustomData);
-      raioxTrack(true, 'Lead', whatsCustomData);
       // O link já abre o WhatsApp em nova aba (target="_blank"), então
       // não é necessário prevenir o comportamento padrão aqui.
     });
